@@ -1,0 +1,2 @@
+1. minimum no. of increasing subsequence = maximum length of non-decreasing subsequence
+2. increasing => lower_bound, non-increasing => upper_bound 
