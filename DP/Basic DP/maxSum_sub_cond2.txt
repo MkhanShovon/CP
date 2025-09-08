@@ -1,0 +1,35 @@
+/*
+https://leetcode.com/problems/maximum-alternating-subsequence-sum/description/?utm_source=chatgpt.com
+
+*/
+using ll = long long;
+class Solution {
+public:
+    vector<vector<ll>>dp;
+    ll n;
+    vector<int> v;
+    ll fun(ll pos, ll sign){
+        if(pos == n){
+            return 0;
+        }
+        if(dp[pos][sign] != -1){
+            return dp[pos][sign];
+        }
+
+        ll ans = 0;
+        if(sign){
+            ans = v[pos];
+        }
+        else{
+            ans = -v[pos];
+        }
+
+        return dp[pos][sign] = max(fun(pos + 1, sign), ans + fun(pos + 1, 1 ^ sign));
+    }
+    long long maxAlternatingSum(vector<int>& nums) {
+        n = nums.size();
+        v = nums;
+        dp.assign(n + 1, vector<ll>(2, -1));
+        return fun(0, 1);
+    }
+};

@@ -1,0 +1,6 @@
+/*
+You're looking for a subsequence of an array (N < 100,000) that:
+Maximizes an alternating sum: A1 - A2 + A3 - A4 + ...
+Cannot include consecutive elements from the original array (i.e., you must skip at least one element between any two picks).
+*/
+
