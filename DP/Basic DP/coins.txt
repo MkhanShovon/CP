@@ -1,0 +1,99 @@
+1.can use at most once
+=> for(int i = 0; i < n; i++) {
+       for(int j = W; j >= wt[i]; j--) {
+         dp[j] = max(dp[j], val[i] + dp[j - wt[i]]);
+       }
+     }
+
+2.can use any number of times, order does not matter
+=> for(int sum = 0; sum <= W; sum++) {
+       for(int i = 0; i < n; i++) {
+         if(sum - wt[i] >= 0) {
+           dp[sum] = max(dp[sum], val[i] + dp[sum - wt[i]]);
+         }
+       }
+     }
+
+3.can use any number of times, order matters
+=> for(int i = 0; i < n; i++) {
+       for(int sum = wt[i]; sum <= W; sum++) {
+         dp[sum] = max(dp[sum], val[i] + dp[sum - wt[i]]);
+       }
+     }
+
+
+
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+const ll NEG_INF = -(1LL<<60);
+
+// 1) 0/1 knapsack (each item can be used at most once)
+//    f(i, cap): best value using items i..n-1 with capacity cap.
+ll knap01_rec(int i, int cap, const vector<int>& wt, const vector<int>& val,
+              vector<vector<ll>>& memo) {
+    if (cap < 0) return NEG_INF;             // invalid
+    if (i == (int)wt.size()) return 0;       // no items left
+    ll &res = memo[i][cap];
+    if (res != LLONG_MIN) return res;
+
+    // skip
+    ll best = knap01_rec(i+1, cap, wt, val, memo);
+    // take once
+    if (cap >= wt[i]) {
+        best = max(best, val[i] + knap01_rec(i+1, cap - wt[i], wt, val, memo));
+    }
+    return res = best;
+}
+// usage:
+// vector<vector<ll>> memo(n, vector<ll>(W+1, LLONG_MIN));
+// ll ans = max(0LL, knap01_rec(0, W, wt, val, memo));
+
+
+// 2) Unbounded knapsack, order does NOT matter (combinations)
+//    g(i, cap): best value using items i..n-1 with cap (each item can repeat).
+//    Staying on i when taking ensures combinations (order ignored).
+ll unbounded_combo_rec(int i, int cap, const vector<int>& wt, const vector<int>& val,
+                       vector<vector<ll>>& memo) {
+    if (cap < 0) return NEG_INF;
+    if (i == (int)wt.size()) return (cap == 0 ? 0 : 0); // no more items; best is 0 if nothing fits further
+    ll &res = memo[i][cap];
+    if (res != LLONG_MIN) return res;
+
+    // skip item i
+    ll best = unbounded_combo_rec(i+1, cap, wt, val, memo);
+
+    // take item i (stay at i to allow unlimited usage)
+    if (cap >= wt[i]) {
+        best = max(best, val[i] + unbounded_combo_rec(i, cap - wt[i], wt, val, memo));
+    }
+    return res = best;
+}
+// usage:
+// vector<vector<ll>> memo2(n, vector<ll>(W+1, LLONG_MIN));
+// for (int c=0;c<=W;c++) memo2[n-1][c] = LLONG_MIN;  // not necessary if using code above
+// ll ans2 = max(0LL, unbounded_combo_rec(0, W, wt, val, memo2));
+
+
+// 3) Unbounded knapsack, order DOES matter (permutations/sequences)
+//    h(cap): best value to exactly fill 'cap' by sequencing items (each unlimited).
+//    This mirrors the iterative dp that loops sum outside, items inside.
+ll unbounded_perm_rec(int cap, const vector<int>& wt, const vector<int>& val,
+                      vector<ll>& memo) {
+    if (cap == 0) return 0;
+    if (cap < 0)  return NEG_INF;
+    ll &res = memo[cap];
+    if (res != LLONG_MIN) return res;
+
+    ll best = NEG_INF;
+    for (int i = 0; i < (int)wt.size(); ++i) {
+        if (cap >= wt[i]) {
+            ll got = unbounded_perm_rec(cap - wt[i], wt, val, memo);
+            if (got != NEG_INF) best = max(best, val[i] + got);
+        }
+    }
+    return res = best;
+}
+// usage:
+// vector<ll> memo3(W+1, LLONG_MIN);
+// ll ans3 = max(0LL, unbounded_perm_rec(W, wt, val, memo3));
