@@ -1,0 +1,33 @@
+You have n dice, and each dice has k faces numbered from 1 to k.
+
+Given three integers n, k, and target, return the number of possible ways (out of the kn total ways) to roll the dice, so the sum of the face-up numbers equals target. Since the answer may be too large, return it modulo 109 + 7.
+
+ class Solution {
+public:
+    int numRollsToTarget(int n, int k, int target) {
+        vector<int> dp(target + 1);
+        dp[0] = 1;
+        auto cur = dp, prv = dp;
+
+        for(int sum = 1; sum <= target; sum++){
+            prv[sum] = prv[sum - 1] + dp[sum];
+        }
+        int mod = 1e9 + 7;
+        for (int i = 1; i <= n; i++) {
+            cur[0] = 0;
+            for (int sum = 1; sum <= target; sum++) {
+                if (sum - k - 1 >= 0) {
+                    dp[sum] = prv[sum - 1] - prv[sum - k - 1];
+                } else {
+                    dp[sum] = prv[sum - 1];
+                }
+
+                dp[sum] = (dp[sum] + mod) % mod;
+                cur[sum] = (cur[sum - 1] + dp[sum]) % mod;
+            }
+            swap(cur, prv);
+        }
+
+        return dp[target];
+    }
+};
