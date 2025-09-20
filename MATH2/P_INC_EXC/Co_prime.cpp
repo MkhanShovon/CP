@@ -1,0 +1,305 @@
+#include <iostream>
+#include <bits/stdc++.h>
+// #include <sys/resource.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace std;
+// using namespace chrono;
+using namespace __gnu_pbds;
+template <typename T>
+using oset = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+template <typename T>
+using omset = tree<T, null_type, less_equal<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+template <typename T, typename R>
+using o_map = tree<T, R, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+// Pragmas
+#pragma GCC optimize("O3,unroll-loops")
+// #ifndef LOCAL_PROJECT
+// #pragma GCC target("avx2")
+// #endif
+// #pragma GCC optimize("Ofast")
+
+// Speed
+inline void FastIO()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+}
+
+// Aliases
+using ll = long long;
+using lld = long double;
+using ull = unsigned long long;
+
+// Constants
+const lld pi = 3.141592653589793238;
+const ll INF = LONG_LONG_MAX;
+const ll mod = 1e9 + 7;
+
+// TypeDEf
+typedef pair<ll, ll> pll;
+typedef vector<ll> vll;
+typedef vector<pll> vpll;
+typedef vector<string> vs;
+typedef unordered_map<ll, ll> umll;
+typedef map<ll, ll> mll;
+
+// Macros
+#define ff first
+#define ss second
+#define pb push_back
+#define mp make_pair
+#define fl(i, n) for (ll i = 0; i < n; i++)
+#define fls(i, m, n) for (ll i = m; i <= n; i++)
+#define rl(i, m, n) for (ll i = n; i >= m; i--)
+#define py cout << "Yes\n";
+#define pm cout << "-1\n";
+#define pn cout << "No\n";
+#define vr(v) v.begin(), v.end()
+#define rv(v) v.rbegin(), v.rend()
+#define edl '\n'
+#define len(v) v.size()
+#define nl cout << edl;
+
+// Debug
+void __print(int x) { cerr << x; }
+void __print(long x) { cerr << x; }
+void __print(long long x) { cerr << x; }
+void __print(unsigned x) { cerr << x; }
+void __print(unsigned long x) { cerr << x; }
+void __print(unsigned long long x) { cerr << x; }
+void __print(float x) { cerr << x; }
+void __print(double x) { cerr << x; }
+void __print(long double x) { cerr << x; }
+void __print(char x) { cerr << '\'' << x << '\''; }
+void __print(const char *x) { cerr << '"' << x << '"'; }
+void __print(const string &x) { cerr << '"' << x << '"'; }
+void __print(bool x) { cerr << (x ? "true" : "false"); }
+
+template <typename T, typename V>
+void __print(const pair<T, V> &x)
+{
+    cerr << '{';
+    __print(x.first);
+    cerr << ',';
+    __print(x.second);
+    cerr << '}';
+}
+template <typename T>
+void __print(const T &x)
+{
+    int f = 0;
+    cerr << '{';
+    for (auto &i : x)
+        cerr << (f++ ? "," : ""), __print(i);
+    cerr << "}";
+}
+void _print() { cerr << "]\n"; }
+template <typename T, typename... V>
+void _print(T t, V... v)
+{
+    __print(t);
+    if (sizeof...(v))
+        cerr << ", ";
+    _print(v...);
+}
+#ifndef ONLINE_JUDGE
+#define debug(x...)               \
+    cerr << "[" << #x << "] = ["; \
+    _print(x)
+#else
+#define debug(x...)
+#endif
+
+// Operator overloads
+template <typename T1, typename T2> // cin >> pair<T1, T2>
+istream &operator>>(istream &istream, pair<T1, T2> &p)
+{
+    return (istream >> p.first >> p.second);
+}
+template <typename T> // cin >> vector<T>
+istream &operator>>(istream &istream, vector<T> &v)
+{
+    for (auto &it : v)
+        cin >> it;
+    return istream;
+}
+template <typename T1, typename T2> // cout << pair<T1, T2>
+ostream &operator<<(ostream &ostream, const pair<T1, T2> &p)
+{
+    return (ostream << p.first << " " << p.second);
+}
+template <typename T> // cout << vector<T>
+ostream &operator<<(ostream &ostream, const vector<T> &c)
+{
+    for (auto &it : c)
+        cout << it << " ";
+    return ostream;
+}
+
+// Utility functions
+#define print(x) cout << x << '\n'
+
+template <typename T>
+ll sumvec(vector<T> v)
+{
+    ll n = v.size();
+    ll s = 0;
+    fl(i, n) s += v[i];
+    return s;
+}
+
+long long rng()
+{
+    static std::mt19937 gen(
+        std::chrono::steady_clock::now().time_since_epoch().count());
+    return std::uniform_int_distribution<long long>(0, INT64_MAX)(gen);
+}
+
+void preSolve()
+{
+    // rng = mt19937(chrono::steady_clock::now().time_since_epoch().count());
+    // allocateStackMax();
+}
+
+using i128 = __int128_t;
+
+ll f(ll n, vll &v)
+{
+    ll m = len(v);
+    ll ans = 0;
+    fl(i, (1LL << m))
+    {
+        if (i == 0)
+            continue;
+        vll a;
+        i128 L = 1;
+        ll cnt = 0;
+        fl(j, m)
+        {
+            if ((1LL << j) & i)
+            {
+                a.pb(v[j]);
+                L = L * (i128)v[j];
+                if (L > (i128)n)
+                {
+                    L = n + 1;
+                    break;
+                }
+                cnt++;
+            }
+        }
+
+        ll num = L;
+        num = n / num;
+        // debug(a,  g, num);
+        if (cnt % 2)
+        {
+            ans += num;
+        }
+        else
+        {
+            ans -= num;
+        }
+    }
+    return n - ans;
+}
+
+// Function to find all prime factors of a number
+vpll prime_factorization(int n)
+{ // O(sqrt(n))
+    vpll factors;
+    for (int i = 2; i * i <= n; i++)
+    {
+        if (n % i == 0)
+        {
+            ll cnt = 0;
+            while (n % i == 0)
+            {
+                cnt++;
+                n /= i;
+            }
+            factors.pb({i, cnt});
+        }
+    }
+    if (n > 1)
+    {
+        factors.pb({n, 1});
+    }
+    return factors;
+}
+
+// 2. Sieve-Based Factorization (Fast for Many Queries)
+// O(n log log n) for preprocessing, O(log n) for each query
+const int N = 1e6 + 5;
+int spf[N]; // spf[i] = smallest prime factor of i
+
+void compute_spf()
+{
+    for (int i = 2; i < N; i++)
+        spf[i] = i;
+    for (int i = 2; i * i < N; i++)
+    {
+        if (spf[i] == i)
+        {
+            for (int j = i * i; j < N; j += i)
+                if (spf[j] == j)
+                    spf[j] = i;
+        }
+    }
+}
+
+vector<pair<int, int>> factorize(int x)
+{
+    vector<pair<int, int>> res;
+    while (x != 1)
+    {
+        int p = spf[x], cnt = 0;
+        while (x % p == 0)
+            x /= p, cnt++;
+        res.emplace_back(p, cnt);
+    }
+    return res;
+}
+
+// Code
+void solve()
+{
+    ll a, b, n;
+    cin >> a >> b >> n;
+    auto v = prime_factorization(n);
+    vll arr;
+    for(auto [val, cnt] : v){
+        arr.pb(val);
+    }
+
+    print(f(b, arr) - f(a - 1, arr));
+}
+// Main
+signed main()
+{
+    // #ifndef ONLINE_JUDGE
+    //     freopen("Error.txt", "w", stderr);
+    // #endif
+    FastIO();
+    preSolve();
+    ll t = 1;
+    cin >> t;
+    // fl(i, t)
+    // {
+    //     solve();
+    // }
+    // solve();
+    fl(i, t) // Kickstart
+    {
+        cout << "Case #" << i + 1 << ": ";
+        solve();
+        // cout<<"\n";
+    }
+    return 0;
+}
+// End
